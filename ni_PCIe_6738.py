@@ -1,15 +1,20 @@
 import ctypes as C
 import numpy as np
 
-class Analog_Out:
-    def __init__(self, num_channels=32, rate=1e4, verbose=True):
-        """Play analog voltages with a NI-DAQ PCIe-6738"""
+class DAQ:
+    '''
+    Basic device adaptor for National Instruments PCIe-6738 16-Bit, 32 Channels,
+    1 MS/s Analog Output Device. Many more commands are available and have not
+    been implemented.
+    '''
+    def __init__(
+        self, name='NI-DAQ-6738', num_channels=32, rate=1e4, verbose=True):
+        self.name = name
         assert 1 <= num_channels <= 32
         self.num_channels = num_channels
-        self.daq_type = '6738'
         self.max_rate = 1e6
         self.verbose = verbose
-        if self.verbose: print("NI-DAQ-%s: opening..."%self.daq_type)
+        if self.verbose: print("%s: opening..."%self.name)
         self._task_running = False
         self.task_handle = C.c_void_p(0)
         dll.create_task(bytes(), self.task_handle)
@@ -29,7 +34,7 @@ class Analog_Out:
         self.set_rate(rate)
         self._write_voltages(self.voltages)
         self.play_voltages(force_final_zeros=False, block=True)
-        if self.verbose: print("NI-DAQ-%s: opened and ready.\n"%self.daq_type)
+        if self.verbose: print("%s: opened and ready.\n"%self.name)
 
     def s2p(self, seconds): # convert time in seconds to ao 'pixels'
         num_pixels = int(round(self.rate * seconds))
@@ -65,7 +70,7 @@ class Analog_Out:
         self._ensure_task_is_stopped() # must wait for previous play_voltages()
         if voltages is not None:
             self._write_voltages(voltages, force_final_zeros)
-        if self.verbose: print("NI-DAQ-%s: playing voltages..."%self.daq_type)
+        if self.verbose: print("%s: playing voltages..."%self.name)
         dll.start_task(self.task_handle)
         self._task_running = True
         if block:
@@ -78,7 +83,7 @@ class Analog_Out:
         assert voltages.shape[0] >= 2 # at least 2 samples for force_final_zeros
         assert voltages.shape[1] == self.num_channels
         if self.verbose:
-            print("NI-DAQ-%s: writing voltages..."%self.daq_type, end='')
+            print("%s: writing voltages..."%self.name, end='')
         if force_final_zeros:
             if self.verbose:
                 print("(forcing final voltages to zero)", end='')
@@ -100,15 +105,14 @@ class Analog_Out:
             self.num_points_written,
             None)
         if self.verbose:
-            print("\n-> %i points written to each channel."%(
-                self.num_points_written.value))
+            print("\n%s: -> %i points written to each channel."%(
+                self.name, self.num_points_written.value))
         return None
 
     def _ensure_task_is_stopped(self):
         if self._task_running:
             if self.verbose:
-                print("NI-DAQ-%s: waiting to finish play..."%self.daq_type,
-                      end='')
+                print("%s: waiting to finish voltage play..."%self.name, end='')
             dll.finish_task(self.task_handle, -1)
             if self.verbose: print(" done.")
             dll.stop_task(self.task_handle)
@@ -119,9 +123,9 @@ class Analog_Out:
         # TODO: make it harder to forget .close() which can leave persistant
         # voltages. _del_? _enter_ and _exit_?
         self._ensure_task_is_stopped()
-        if self.verbose: print("NI-DAQ-%s: closing..."%self.daq_type)
+        if self.verbose: print("%s: closing..."%self.name, end='')
         dll.clear_task(self.task_handle)
-        if self.verbose: print("NI-DAQ-%s: closed."%self.daq_type)
+        if self.verbose: print("%s: done."%self.name)
         return None
 
 ### Tidy and store DLL calls away from main program:
@@ -204,7 +208,7 @@ dll.clear_task.argtypes = [C.c_void_p]
 dll.clear_task.restype = check_error
 
 if __name__ == '__main__':
-    ao = Analog_Out(num_channels=1, rate=1e6, verbose=True)
+    ao = DAQ(num_channels=1, rate=1e6, verbose=True)
     play_s = 1
 
     print('\nVoltage step:')
