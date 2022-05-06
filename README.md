@@ -1,5 +1,5 @@
 # ni_PCIe_6738
-Python device adaptor: National Instruments 16-Bit, 32 Channels, 1 MS/s Analog Output Device
+Python device adaptor: National Instruments 16-Bit, 32 Channels, 1 MS/s Analog Output Device.
 ## Quick start:
 - Install the NI-DAQ PCIe-6738 board, then the "NI-DAQmx" driver and then run "ni_PICe_6739.py" 
 to generate voltages (requires Python and numpy).
@@ -23,4 +23,4 @@ and contains the NI-DAQmx ANSI C API.
 (typically found with "Start»Programs»National Instruments»NI-DAQ»NI-DAQmx C Reference Help"). For more
 general help check out "NI-DAQmx Help" (same location) or search online.
 - To get started on how to combine function calls into a program check out the collection
-of "NI-DAQmx ANSI C" examples like the "VoltUpdate.c" included in this repository
+of "NI-DAQmx ANSI C" examples like the "VoltUpdate.c" included in this repository.
