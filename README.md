@@ -3,6 +3,9 @@ Python device adaptor: National Instruments 16-Bit, 32 Channels, 1 MS/s Analog O
 ## Quick start:
 - Install the NI-DAQ PCIe-6738 board, then the "NI-DAQmx" driver and then run "ni_PICe_6739.py" 
 to generate voltages (requires Python and numpy).
+
+![social_preview](https://github.com/amsikking/ni_PCIe_6738/blob/main/social_preview.png)
+
 ## Details:
 - National Instruments (NI) makes many "data acquisition systems" (DAQ's) often refered to as NI-DAQ's.
 These PC controlled devices offer many options for analogue and digital input/output (ai/ao/di/do), with
